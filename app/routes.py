@@ -1,8 +1,8 @@
-from flask import render_template, url_for, flash, redirect, request
-from app import app, db, bcrypt
+from flask import current_app as app, render_template, url_for, flash, redirect, request
+from flask_login import login_user, current_user, logout_user, login_required
+from app import db, bcrypt
 from app.forms import RegistrationForm, LoginForm
 from app.models import User
-from flask_login import login_user, current_user, logout_user, login_required
 
 @app.route("/", methods=['GET', 'POST'])
 def register():
@@ -11,10 +11,18 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password, user_type=form.user_type.data, 
-                    first_name=form.first_name.data, last_name=form.last_name.data, 
-                    address_line1=form.address_line1.data, city=form.city.data, 
-                    state=form.state.data, pincode=form.pincode.data)
+        user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password=hashed_password,
+            user_type=form.user_type.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            address_line1=form.address_line1.data,
+            city=form.city.data,
+            state=form.state.data,
+            pincode=form.pincode.data
+        )
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created!', 'success')
